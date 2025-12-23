@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bebidas Express | Catálogo Profesional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #f9f9f9; color: #333; overflow-x: hidden; font-family: 'Inter', sans-serif; }
+        .brand-red { background-color: #9e0b0f; }
+        .brand-red-text { color: #9e0b0f; }
+        .drawer { transition: transform 0.3s ease-in-out; }
+        .legal-text { font-size: 0.65rem; line-height: 1rem; color: #9ca3af; }
+    </style>
+</head>
+<body>
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
+            <button onclick="toggleMenu()" class="md:hidden text-2xl p-2 text-gray-600 focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl md:text-2xl font-black brand-red-text italic cursor-pointer uppercase tracking-tighter" onclick="filterCategory('todos')">
+                Bebidas Express
+            </h1>
+            <div class="hidden md:flex gap-8 text-xs uppercase font-bold text-gray-400">
+                <button onclick="filterCategory('todos')" class="hover:brand-red-text transition">Inicio</button>
+                <button onclick="filterCategory('vinos')" class="hover:brand-red-text transition">Vinos</button>
+                <button onclick="filterCategory('cervezas')" class="hover:brand-red-text transition">Cervezas</button>
+                <button onclick="filterCategory('whisky')" class="hover:brand-red-text transition">Whisky</button>
+                <button onclick="filterCategory('otros')" class="hover:brand-red-text transition">Otros</button>
+            </div>
+            <div class="relative cursor-pointer" onclick="toggleCart()">
+                <i class="fas fa-shopping-basket text-2xl text-gray-700"></i>
+                <span id="cart-count" class="absolute -top-2 -right-2 brand-red text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden" onclick="toggleMenu()">
+        <div class="drawer absolute left-0 top-0 h-full w-72 bg-white p-6" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-10 border-b pb-4">
+                <span class="font-black brand-red-text italic text-lg uppercase tracking-widest">Navegación</span>
+                <button onclick="toggleMenu()" class="text-3xl text-gray-300">&times;</button>
+            </div>
+            <div class="flex flex-col gap-6 uppercase font-bold text-gray-500 text-sm tracking-widest text-left">
+                <button onclick="filterCategory('todos')" class="text-left py-1 hover:brand-red-text">Inicio</button>
+                <button onclick="filterCategory('vinos')" class="text-left py-1 hover:brand-red-text">Vinos</button>
+                <button onclick="filterCategory('cervezas')" class="text-left py-1 hover:brand-red-text">Cervezas</button>
+                <button onclick="filterCategory('whisky')" class="text-left py-1 hover:brand-red-text">Whisky</button>
+                <button onclick="filterCategory('otros')" class="text-left py-1 hover:brand-red-text">Otros</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="max-w-6xl mx-auto md:mt-6 px-0 md:px-4">
+        <div class="relative h-64 md:h-[400px] w-full bg-gray-900 md:rounded-xl overflow-hidden shadow-xl">
+            <img src="https://images.unsplash.com/photo-1578911373434-0cb395d2cbfb?q=80&w=1200&auto=format&fit=crop" class="absolute w-full h-full object-cover opacity-50">
+            <div class="relative h-full flex flex-col justify-center items-center text-center text-white p-8">
+                <h2 class="text-4xl md:text-6xl font-black uppercase italic mb-3 tracking-tighter">Stock Directo</h2>
+                <p class="text-[10px] md:text-sm font-medium mb-8 uppercase tracking-[0.3em] opacity-80">Precios actualizados</p>
+                <button onclick="document.getElementById('catalog').scrollIntoView({behavior: 'smooth'})" class="brand-red px-10 py-4 rounded-sm font-bold uppercase text-[10px] tracking-widest hover:bg-red-800 transition-all">
+                    Explorar Productos
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="catalog" class="max-w-6xl mx-auto p-4 mt-12">
+        <div id="loading" class="text-center py-20 text-gray-400 font-medium tracking-widest text-xs animate-pulse">CARGANDO INVENTARIO...</div>
+        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
+    </main>
+
+    <div id="cart-sidebar" class="fixed right-0 top-0 h-full w-full md:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[100] flex flex-col">
+        <div class="p-6 brand-red text-white flex justify-between items-center shadow-lg">
+            <h3 class="text-xs font-bold uppercase tracking-[0.2em]">Resumen de Compra</h3>
+            <button onclick="toggleCart()" class="text-3xl">&times;</button>
+        </div>
+        <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4"></div>
+        <div class="p-8 border-t bg-gray-50">
+            <div class="flex justify-between items-center mb-8">
+                <span class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Total</span>
+                <span id="cart-total" class="brand-red-text font-black text-3xl">$0</span>
+            </div>
+            <button onclick="sendWhatsApp()" class="w-full bg-green-700 text-white py-5 rounded-sm font-bold uppercase text-[10px] tracking-widest hover:bg-green-800 transition-all flex justify-center items-center gap-3">
+                <i class="fab fa-whatsapp text-lg"></i> Confirmar Pedido
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzATIXD-tLJJb707l68PeLQLYsQJWdU-4lJfc5fDCe5xMbuEf6JuZzpTlb48OzfUSldSj8g6IhEM7V/pub?output=csv';
+        let products = [];
+        let cart = [];
+
+        function csvToArray(str, d = ",") {
+            const h = str.slice(0, str.indexOf("\n")).split(d).map(x => x.trim().toLowerCase());
+            const r = str.slice(str.indexOf("\n") + 1).split("\n");
+            return r.filter(x => x.trim()).map(x => {
+                const v = []; let t = ''; let q = false;
+                for (let i = 0; i < x.length; i++) {
+                    const c = x[i];
+                    if (c === '"' && !q) q = true;
+                    else if (c === '"' && q && x[i+1] === '"') { t += c; i++; }
+                    else if (c === '"' && q) q = false;
+                    else if (c === d && !q) { v.push(t.trim()); t = ''; }
+                    else t += c;
+                }
+                v.push(t.trim());
+                return h.reduce((acc, name, idx) => { acc[name] = v[idx] || ""; return acc; }, {});
+            });
+        }
+
+        async function loadData() {
+            try {
+                const res = await fetch(CSV_URL);
+                const text = await res.text();
+                const arrayData = csvToArray(text);
+
+                products = arrayData.map(item => ({
+                    id: item.id || Math.random(),
+                    name: item.nombre,
+                    img: item.imagen,
+                    cm3: item.cm3,
+                    category: (item['tipo de bebida'] || 'otros').toLowerCase().trim(),
+                    // MAPEADO DE COLUMNAS SOLICITADO
+                    oldPrice: item['precio sin descuento'], // Columna D
+                    pricePerLiter: item['precio por litro'], // Columna G
+                    priceNoTax: item['precio sin imp. nacionales'], // Columna H
+                    promo: item.promocion,
+                    finalPrice: parseFloat(String(item['precio con descuento']).replace(/[^0-9.-]+/g, "")) || 0 // Columna K
+                }));
+
+                document.getElementById('loading').classList.add('hidden');
+                renderProducts(products);
+            } catch (e) {
+                document.getElementById('loading').innerText = "Error cargando catálogo.";
+            }
+        }
+
+        function renderProducts(items) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            items.forEach(p => {
+                grid.innerHTML += `
+                    <div class="bg-white p-5 rounded-sm flex flex-col relative border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                        ${p.promo && p.promo !== 'N/A' ? `<span class="absolute top-4 left-4 bg-black text-white text-[9px] font-bold px-3 py-1 z-10 uppercase tracking-tighter shadow-lg">${p.promo}</span>` : ''}
+                        
+                        <img src="${p.img}" class="w-full h-48 object-contain mb-6" onerror="this.src='https://via.placeholder.com/400?text=Sin+Imagen'">
+                        
+                        <div class="mb-4">
+                            <span class="text-[9px] font-bold text-gray-300 uppercase tracking-widest">${p.category} | ${p.cm3}cc</span>
+                            <h3 class="font-bold text-sm leading-tight text-gray-800 uppercase mt-1 h-8 overflow-hidden">${p.name}</h3>
+                        </div>
+
+                        <div class="mb-5 flex flex-col">
+                            <span class="text-[11px] text-gray-400 line-through">$${p.oldPrice}</span>
+                            
+                            <span class="text-3xl font-black brand-red-text tracking-tighter">$${p.finalPrice.toLocaleString()}</span>
+                            
+                            <div class="mt-2 pt-2 border-t border-gray-50">
+                                <p class="legal-text uppercase tracking-tighter">Precio por litro: $${p.pricePerLiter}</p>
+                                <p class="legal-text uppercase tracking-tighter">Neto sin imp. nac: $${p.priceNoTax}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 mt-auto pt-4">
+                            <input type="number" id="qty-${p.id}" value="1" min="1" class="w-10 border-b border-gray-100 py-1 text-center font-bold text-sm bg-transparent">
+                            <button onclick="addToCart('${p.id}')" class="flex-grow bg-gray-900 text-white py-2 font-bold uppercase text-[9px] tracking-[0.2em] hover:bg-black active:scale-95 transition-all">Agregar</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function toggleMenu() { document.getElementById('mobile-menu-overlay').classList.toggle('hidden'); }
+        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('translate-x-full'); }
+
+        function filterCategory(cat) {
+            const fil = cat === 'todos' ? products : products.filter(p => p.category === cat);
+            renderProducts(fil);
+            if(!document.getElementById('mobile-menu-overlay').classList.contains('hidden')) toggleMenu();
+        }
+
+        function addToCart(id) {
+            const p = products.find(x => x.id == id);
+            const qty = parseInt(document.getElementById(`qty-${id}`).value);
+            const ex = cart.find(x => x.id == id);
+            if(ex) ex.qty += qty; else cart.push({...p, qty});
+            updateUI();
+        }
+
+        function updateUI() {
+            const cont = document.getElementById('cart-items');
+            cont.innerHTML = cart.length ? '' : '<p class="text-center text-gray-400 mt-20 text-[10px] tracking-widest uppercase italic">CARRITO VACÍO</p>';
+            cart.forEach((item, i) => {
+                cont.innerHTML += `
+                    <div class="flex justify-between items-center border-b border-gray-50 pb-4">
+                        <div class="flex-grow pr-4">
+                            <p class="font-bold text-[10px] uppercase tracking-wider mb-1">${item.name}</p>
+                            <p class="brand-red-text font-bold text-sm">$${(item.finalPrice*item.qty).toLocaleString()}</p>
+                        </div>
+                        <div class="flex border border-gray-100 items-center bg-white">
+                            <button onclick="changeQty(${i},-1)" class="px-2 py-1 text-xs">-</button>
+                            <span class="px-3 text-xs font-bold">${item.qty}</span>
+                            <button onclick="changeQty(${i},1)" class="px-2 py-1 text-xs">+</button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('cart-total').innerText = `$${cart.reduce((s,i)=>s+(i.finalPrice*i.qty),0).toLocaleString()}`;
+            document.getElementById('cart-count').innerText = cart.reduce((s,i)=>s+i.qty,0);
+        }
+
+        function changeQty(i,d){ cart[i].qty+=d; if(cart[i].qty<=0) cart.splice(i,1); updateUI(); }
+
+        function sendWhatsApp() {
+            if(!cart.length) return;
+            let m = "PEDIDO WEB - BEBIDAS EXPRESS\n\n";
+            cart.forEach(i => m += `* ${i.qty}x ${i.name.toUpperCase()} ($${(i.finalPrice*i.qty).toLocaleString()})\n`);
+            m += `\nTOTAL ESTIMADO: $${cart.reduce((s,i)=>s+(i.finalPrice*i.qty),0).toLocaleString()}`;
+            window.open(`https://wa.me/5491122334455?text=${encodeURIComponent(m)}`, '_blank');
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
